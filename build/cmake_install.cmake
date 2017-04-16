@@ -120,6 +120,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/tmp_host_share/workspace_dev/tutorial_ws/build/velodyne/velodyne/cmake_install.cmake")
   include("/tmp_host_share/workspace_dev/tutorial_ws/build/velodyne/velodyne_msgs/cmake_install.cmake")
   include("/tmp_host_share/workspace_dev/tutorial_ws/build/beginner_tutorials/cmake_install.cmake")
+  include("/tmp_host_share/workspace_dev/tutorial_ws/build/dd_process_code/cmake_install.cmake")
   include("/tmp_host_share/workspace_dev/tutorial_ws/build/velodyne/velodyne_driver/cmake_install.cmake")
   include("/tmp_host_share/workspace_dev/tutorial_ws/build/velodyne/velodyne_pointcloud/cmake_install.cmake")
 

@@ -342,6 +342,12 @@ cloud_nodelet_LIB_DEPENDS:STATIC=general;velodyne_rawdata;general;/opt/ros/kinet
 //The directory containing a CMake configuration file for cpp_common.
 cpp_common_DIR:PATH=/opt/ros/kinetic/share/cpp_common/cmake
 
+//Value Computed by CMake
+dd_process_code_BINARY_DIR:STATIC=/tmp_host_share/workspace_dev/tutorial_ws/build/dd_process_code
+
+//Value Computed by CMake
+dd_process_code_SOURCE_DIR:STATIC=/tmp_host_share/workspace_dev/tutorial_ws/src/dd_process_code
+
 //The directory containing a CMake configuration file for diagnostic_msgs.
 diagnostic_msgs_DIR:PATH=/opt/ros/kinetic/share/diagnostic_msgs/cmake
 
@@ -675,7 +681,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=12
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=13
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

@@ -8,4 +8,3 @@
 
 # modified environment variables
 export PWD="/tmp_host_share/workspace_dev/tutorial_ws/build"
-export PYTHONPATH="/tmp_host_share/workspace_dev/tutorial_ws/devel/lib/python2.7/dist-packages:$PYTHONPATH"
