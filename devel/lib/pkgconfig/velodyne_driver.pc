@@ -1,0 +1,8 @@
+prefix=/tmp_host_share/workspace_dev/tutorial_ws/devel
+
+Name: velodyne_driver
+Description: Description of velodyne_driver
+Version: 1.2.0
+Cflags: -I/tmp_host_share/workspace_dev/tutorial_ws/devel/include -I/tmp_host_share/workspace_dev/tutorial_ws/src/velodyne/velodyne_driver/include
+Libs: -L/tmp_host_share/workspace_dev/tutorial_ws/devel/lib -lvelodyne_input
+Requires: diagnostic_updater dynamic_reconfigure nodelet roscpp tf velodyne_msgs
