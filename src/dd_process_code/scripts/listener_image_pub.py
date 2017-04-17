@@ -43,6 +43,8 @@ import matplotlib.pyplot as plt
 import cv2
 from std_msgs.msg import String
 from sensor_msgs.msg import PointCloud2
+from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Point
 
 def callback(data):
     rospy.loginfo(rospy.get_caller_id() )
@@ -58,7 +60,7 @@ def callback(data):
 #
 # Setup call to publish
 #
-    pub = rospy.Publisher('/odom_test', String, queue_size=10)
+    pub = rospy.Publisher('/odom_test', Odometry, queue_size=10)
 #
 # Convert data streams into floats etc.
 #
@@ -103,7 +105,13 @@ def callback(data):
 #
 # Publish message
 #
-        pub.publish(String("myMessage"))        
+###        pub.publish(String("myMessage"))   
+        x = 1.5
+        y = 2.3
+        z = -0.4    
+        msg = Odometry()
+        msg.pose.pose.position = Point(x, y, z) 
+        pub.publish(msg)        
                 
 ###        print('Timestamp (sec) = ', data.header.stamp.secs)
 ###        print('ringNum = ', ringNum)
