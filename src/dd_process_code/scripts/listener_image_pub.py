@@ -47,20 +47,20 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point
 
 def callback(data):
-    rospy.loginfo(rospy.get_caller_id() )
-    print('Header: ', data.header)
-    print('seq: ', data.header.seq)
-    print('height: ', data.height)
-    print('width: ', data.width)
-    print('fields: ', data.fields)
-    print('point_step: ', data.point_step)
-    print('row_step: ', data.row_step)
-    print('bigendian: ', data.is_bigendian)
+###    rospy.loginfo(rospy.get_caller_id() )
+###    print('Header: ', data.header)
+###    print('seq: ', data.header.seq)
+###    print('height: ', data.height)
+###    print('width: ', data.width)
+###    print('fields: ', data.fields)
+###    print('point_step: ', data.point_step)
+###    print('row_step: ', data.row_step)
+###    print('bigendian: ', data.is_bigendian)
 
 #
 # Setup call to publish
 #
-    pub = rospy.Publisher('/odom_test', Odometry, queue_size=10)
+    pub = rospy.Publisher('/objects/obs1_e/rear/gps/rtkfix', Odometry, queue_size=10)
 #
 # Convert data streams into floats etc.
 #
@@ -105,10 +105,9 @@ def callback(data):
 #
 # Publish message
 #
-###        pub.publish(String("myMessage"))   
-        x = 1.5
-        y = 2.3
-        z = -0.4    
+        x = 10.5
+        y = -85.0 
+        z = 0.4    
         msg = Odometry()
         msg.header.stamp=data.header.stamp
         msg.pose.pose.position = Point(x, y, z) 
