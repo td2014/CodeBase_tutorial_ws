@@ -38,6 +38,9 @@
 
 import rospy
 import struct
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
 from std_msgs.msg import String
 from sensor_msgs.msg import PointCloud2
 
@@ -61,16 +64,35 @@ def callback(data):
     intOffset=12
     pointStep=data.point_step
     rowLength=data.width
-    frameNum = data.header.seq
-    for iData in range(rowLength):
-        baseIdx = iData*pointStep
-        x = struct.unpack('f', data.data[baseIdx:baseIdx+4])
-        y = struct.unpack('f', data.data[baseIdx+4:baseIdx+8])
-        z = struct.unpack('f', data.data[baseIdx+8:baseIdx+12])
+    frameNum=0
+    targFrame=0
 
-    print('x, y, z = ', x, y, z)
-    print('')
+    if frameNum==targFrame:  #create birds-eye snapshot (assume x-y plane)
+        xSize=500 #pix
+        ySize=500 #pix
+        xScale=5  #pix/meter
+        yScale=5  #pix/meter
+        xOffset=50 #meters
+        yOffset=50 #meters
+        imageGrid = np.zeros([xSize,ySize])
+        for iData in range(rowLength):
+            baseIdx = iData*pointStep
+            x = struct.unpack('f', data.data[baseIdx:baseIdx+4])
+            y = struct.unpack('f', data.data[baseIdx+4:baseIdx+8])
+            z = struct.unpack('f', data.data[baseIdx+8:baseIdx+12])
 
+#
+# Assume a 100x100 meter grid centered on vehicle, resolution 1 meter (for now)
+#
+
+            xIdx = int((x[0]+xOffset)*xScale)
+            yIdx = int((y[0]+yOffset)*yScale)
+            if xIdx < xSize and yIdx < ySize :
+                imageGrid[xIdx,yIdx] = 1.0
+
+        cv2.imshow('image',imageGrid)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 #
 # End of callback
 #
