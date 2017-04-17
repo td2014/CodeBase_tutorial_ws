@@ -79,7 +79,9 @@ def callback(data):
             baseIdx = iData*pointStep
             x = struct.unpack('f', data.data[baseIdx:baseIdx+4])
             y = struct.unpack('f', data.data[baseIdx+4:baseIdx+8])
-            z = struct.unpack('f', data.data[baseIdx+8:baseIdx+12])
+###            z = struct.unpack('f', data.data[baseIdx+8:baseIdx+12])
+            lidarInt = struct.unpack('f', data.data[baseIdx+16:baseIdx+20])
+            ringNum = struct.unpack('i', data.data[baseIdx+20:baseIdx+24])
 
 #
 # Assume a 100x100 meter grid centered on vehicle, resolution 1 meter (for now)
@@ -87,9 +89,12 @@ def callback(data):
 
             xIdx = int((x[0]+xOffset)*xScale)
             yIdx = int((y[0]+yOffset)*yScale)
-            if xIdx < xSize and yIdx < ySize :
-                imageGrid[xIdx,yIdx] = 1.0
-
+            if xIdx < xSize and yIdx < ySize and ringNum[0]>11 and ringNum[0]<20:
+                imageGrid[xIdx,yIdx] = 1.0*ringNum[0]
+                
+        
+        print('Timestamp (sec) = ', data.header.stamp.secs)
+        print('ringNum = ', ringNum)
         cv2.imshow('image',imageGrid)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
