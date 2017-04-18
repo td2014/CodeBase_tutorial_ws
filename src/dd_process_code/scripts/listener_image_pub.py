@@ -105,9 +105,9 @@ def callback(data):
 #
 # Publish message
 #
-        x = 10.5
-        y = -85.0 
-        z = 0.4    
+        x = 0.69
+        y = -76.9 
+        z = 2.18    
         msg = Odometry()
         msg.header.stamp=data.header.stamp
         msg.pose.pose.position = Point(x, y, z) 
