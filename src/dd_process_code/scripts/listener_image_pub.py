@@ -46,6 +46,9 @@ from sensor_msgs.msg import PointCloud2
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point
 
+global generateEstimates
+generateEstimates=False
+
 def callback(data):
 ###    rospy.loginfo(rospy.get_caller_id() )
 ###    print('Header: ', data.header)
@@ -64,12 +67,10 @@ def callback(data):
 #
 # Convert data streams into floats etc.
 #
-    pointStep=data.point_step
-    rowLength=data.width
-    frameNum=0
-    targFrame=0
 
-    if frameNum==targFrame:  #create birds-eye snapshot (assume x-y plane)
+    if generateEstimates:  # obstacle estimation processing
+        pointStep=data.point_step
+        rowLength=data.width
         xSize=500 #pix
         ySize=500 #pix
         xScale=5  #pix/meter
@@ -84,12 +85,12 @@ def callback(data):
             baseIdx = iData*pointStep
             x = struct.unpack('f', data.data[baseIdx:baseIdx+4])
             y = struct.unpack('f', data.data[baseIdx+4:baseIdx+8])
-###            z = struct.unpack('f', data.data[baseIdx+8:baseIdx+12])
+            z = struct.unpack('f', data.data[baseIdx+8:baseIdx+12])
             lidarInt = struct.unpack('f', data.data[baseIdx+16:baseIdx+20])
             ringNum = struct.unpack('i', data.data[baseIdx+20:baseIdx+24])
 
 #
-# Assume a grid centered on vehicle
+# Assume a grid centered on capture vehicle for image purposes
 #
 
             xIdx = int((x[0]+xOffset)*xScale)
@@ -105,13 +106,22 @@ def callback(data):
 #
 # Publish message
 #
-        x = 0.69
+
+    if generateEstimates:  # regular processing mode
+        print('regular processing mode:')
+        x = 0.69  # RTKFix values approximately equal to obs1 in dataset 1-10 in release 2
         y = -76.9 
-        z = 2.18    
-        msg = Odometry()
-        msg.header.stamp=data.header.stamp
-        msg.pose.pose.position = Point(x, y, z) 
-        pub.publish(msg)        
+        z = 2.18 
+    else:
+        print('diagnostic processing mode:')
+        x = data.pose.pose.position.x  # diagnostic testing only
+        y = data.pose.pose.position.y  # diagnostic testing only
+        z = data.pose.pose.position.z  # diagnostic testing only
+
+    msg = Odometry()
+    msg.header.stamp=data.header.stamp
+    msg.pose.pose.position = Point(x, y, z) 
+    pub.publish(msg)        
                 
 ###        print('Timestamp (sec) = ', data.header.stamp.secs)
 ###        print('ringNum = ', ringNum)
@@ -132,7 +142,10 @@ def listener():
     # run simultaneously.
     rospy.init_node('listener', anonymous=True)
 
-    rospy.Subscriber('velodyne_points', PointCloud2, callback)
+    if generateEstimates:  # regular processing
+        rospy.Subscriber('velodyne_points', PointCloud2, callback)
+    else:  # diagnostic processing
+        rospy.Subscriber('objects/obs1/rear/gps/rtkfix', Odometry, callback)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
