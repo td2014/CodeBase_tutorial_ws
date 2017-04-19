@@ -47,7 +47,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point
 
 global generateEstimates
-generateEstimates=False
+generateEstimates=True
 
 def callback(data):
 ###    rospy.loginfo(rospy.get_caller_id() )
@@ -63,8 +63,12 @@ def callback(data):
 #
 # Setup call to publish
 #
-###    pub = rospy.Publisher('/objects/obs1_e/rear/gps/rtkfix', Odometry, queue_size=10)
-    pub = rospy.Publisher('/objects/obs1_diag/rear/gps/rtkfix', Odometry, queue_size=10)
+
+    if generateEstimates:
+        pub = rospy.Publisher('/objects/obs1_e/rear/gps/rtkfix', Odometry, queue_size=10)
+    else: #diagnostic run
+        pub = rospy.Publisher('/objects/obs1_diag/rear/gps/rtkfix', Odometry, queue_size=10)
+
 #
 # Convert data streams into floats etc.
 #
@@ -110,9 +114,12 @@ def callback(data):
 
     if generateEstimates:  # regular processing mode
         print('regular processing mode:')
-        x = 0.69  + np.random.normal()  # RTKFix values approximately equal to obs1 in dataset 1-10 in release 2
-        y = -76.9 + np.random.normal()
-        z = 2.18 
+        ###x = 0.69  + np.random.normal()  # RTKFix values approximately equal to obs1 in dataset 1-10 in release 2
+        ###y = -76.9 + np.random.normal()
+        ###z = 2.18 
+        x = 20.0 # data.pose.pose.position.x  # testing only relative to capture_vehicle RTK coords
+        y = -5.0 # data.pose.pose.position.y  # 
+        z = 1.0  # data.pose.pose.position.z  # 
     else:
         print('diagnostic processing mode:')
         x = data.pose.pose.position.x  # diagnostic testing only
@@ -145,6 +152,7 @@ def listener():
 
     if generateEstimates:  # regular processing
         rospy.Subscriber('velodyne_points', PointCloud2, callback)
+###        rospy.Subscriber('objects/capture_vehicle/front/gps/rtkfix', Odometry, callback)
     else:  # diagnostic processing
         rospy.Subscriber('objects/obs1/rear/gps/rtkfix', Odometry, callback)
 
