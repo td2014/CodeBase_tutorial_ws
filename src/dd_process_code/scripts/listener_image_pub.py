@@ -130,12 +130,15 @@ def callback(data):
     msg.header.stamp=data.header.stamp
     msg.pose.pose.position = Point(x, y, z) 
     pub.publish(msg)        
-                
-###        print('Timestamp (sec) = ', data.header.stamp.secs)
-###        print('ringNum = ', ringNum)
-###        cv2.imshow('image',imageGrid)
-###        cv2.waitKey(0)
-###        cv2.destroyAllWindows()
+
+#
+# Display bird-eye image
+#                
+    print('Timestamp (sec) = ', data.header.stamp.secs)
+    print('ringNum = ', ringNum)
+    cv2.imshow('image',imageGrid)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 #
 # End of callback
