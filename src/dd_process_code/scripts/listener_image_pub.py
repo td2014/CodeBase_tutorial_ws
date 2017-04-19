@@ -63,7 +63,8 @@ def callback(data):
 #
 # Setup call to publish
 #
-    pub = rospy.Publisher('/objects/obs1_e/rear/gps/rtkfix', Odometry, queue_size=10)
+###    pub = rospy.Publisher('/objects/obs1_e/rear/gps/rtkfix', Odometry, queue_size=10)
+    pub = rospy.Publisher('/objects/obs1_diag/rear/gps/rtkfix', Odometry, queue_size=10)
 #
 # Convert data streams into floats etc.
 #
@@ -109,13 +110,13 @@ def callback(data):
 
     if generateEstimates:  # regular processing mode
         print('regular processing mode:')
-        x = 0.69  # RTKFix values approximately equal to obs1 in dataset 1-10 in release 2
-        y = -76.9 
+        x = 0.69  + np.random.normal()  # RTKFix values approximately equal to obs1 in dataset 1-10 in release 2
+        y = -76.9 + np.random.normal()
         z = 2.18 
     else:
         print('diagnostic processing mode:')
         x = data.pose.pose.position.x  # diagnostic testing only
-        y = data.pose.pose.position.y  # diagnostic testing only
+        y = data.pose.pose.position.y # + 0.7239  # diagnostic testing only
         z = data.pose.pose.position.z  # diagnostic testing only
 
     msg = Odometry()
