@@ -113,15 +113,15 @@ def callback(data):
 ###                imageGrid[xIdx,yIdx] = 1.0
                 newRange = x[0]*x[0] + y[0]*y[0] 
                 if ringRangeInit[0,ringNum[0]] < 3:  # keep adding to average range calc window
-                    print('here.')
-                    print('Before: ringNum, ringRangeAvg = ', ringNum[0], ringRangeAvg[0,ringNum[0]])
+###                    print('here.')
+###                    print('Before: ringNum, ringRangeAvg = ', ringNum[0], ringRangeAvg[0,ringNum[0]])
                     ringRangeAvg[0, ringNum[0]] = ringRangeAvg[0,ringNum[0]]+newRange
                     ringRangeInit[0,ringNum[0]] = ringRangeInit[0,ringNum[0]]+1
-                    print('After: ringNum, ringRangeAvg = ', ringNum[0], ringRangeAvg[0,ringNum[0]])
+###                    print('After: ringNum, ringRangeAvg = ', ringNum[0], ringRangeAvg[0,ringNum[0]])
                 elif ringRangeInit[0,ringNum[0]]==3:  # compute average (of range^2)
                     ringRangeAvg[0,ringNum[0]] = ringRangeAvg[0,ringNum[0]]/3.0
                     ringRangeInit[0,ringNum[0]] = ringRangeInit[0,ringNum[0]]+1
-                    print('Avg: ringNum, ringRangeAvg = ', ringNum[0], ringRangeAvg[0,ringNum[0]])
+###                    print('Avg: ringNum, ringRangeAvg = ', ringNum[0], ringRangeAvg[0,ringNum[0]])
                 else:
                     if newRange < rangeThresh*ringRangeAvg[0,ringNum[0]]:
                         imageGrid[xIdx,yIdx] = 1.0
@@ -134,7 +134,7 @@ def callback(data):
 #
 
     if generateEstimates:  # regular processing mode
-        print('regular processing mode:')
+###        print('regular processing mode:')
         ###x = 0.69  + np.random.normal()  # RTKFix values approximately equal to obs1 in dataset 1-10 in release 2
         ###y = -76.9 + np.random.normal()
         ###z = 2.18
@@ -164,11 +164,11 @@ def callback(data):
 #
 # Display bird-eye image
 #                
-        print('Timestamp (sec) = ', data.header.stamp.secs)
-        print('Published x, y, z = ', x, y, z)
-        cv2.imshow('image',imageGrid)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+###        print('Timestamp (sec) = ', data.header.stamp.secs)
+###        print('Published x, y, z = ', x, y, z)
+###        cv2.imshow('image',imageGrid)
+###        cv2.waitKey(0)
+###        cv2.destroyAllWindows()
 
 #
 # End of callback
