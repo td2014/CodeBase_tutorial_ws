@@ -64,6 +64,7 @@ def callback(data):
 # Setup call to publish
 #
 
+    publishEstm = False 
     if generateEstimates:
         pub = rospy.Publisher('/objects/obs1_e/rear/gps/rtkfix', Odometry, queue_size=10)
     else: #diagnostic run
@@ -82,9 +83,16 @@ def callback(data):
         yScale=5  #pix/meter
         xOffset=50 #meters
         yOffset=50 #meters
-        ringRangeAvg=np.zeros([1,32])
-        ringRangeInit=np.zeros([1,32])
-        
+        ringRangeAvg=np.zeros([1,32])  # Store range^2 for each ring
+        ringRangeInit=np.zeros([1,32]) # Keeps track of initialized ring range estimates
+        rangeThresh = 0.8  # range^2 less than this factor will be considered detections
+        detx = 0.0  # average x position of detection
+        dety = 0.0  # average y position of detection
+        pointCount = 0 # number of points in detection 
+        x = 0.0
+        y = 0.0
+        z = 0.0
+ 
         imageGrid = np.zeros([xSize,ySize])
         for iData in range(rowLength):
             baseIdx = iData*pointStep
@@ -100,13 +108,26 @@ def callback(data):
 
             xIdx = int((x[0]+xOffset)*xScale)
             yIdx = int((y[0]+yOffset)*yScale)
-            if xIdx < xSize and yIdx < ySize and x[0]>0 and ringNum[0]>11 and ringNum[0]<20:
-###                imageGrid[xIdx,yIdx] = 1.0*ringNum[0]
-                if ringRangeInit[0,ringNum[0]] < 1.0:
-                    ringRangeAvg[0,ringNum[0]] = x[0]**2+y[0]**2
-                    ringRangeInit[0,ringNum[0]] = 1.0
-                elif  x[0]**2+y[0]**2 < 0.75 * ringRangeAvg[0,ringNum[0]]:
-                    imageGrid[xIdx,yIdx] = 1.0
+###            if xIdx < xSize and yIdx < ySize and x[0]>0 and ringNum[0]>11 and ringNum[0]<20:
+            if xIdx < xSize and yIdx < ySize and x[0]>0 and ringNum[0]==17:
+###                imageGrid[xIdx,yIdx] = 1.0
+                newRange = x[0]*x[0] + y[0]*y[0] 
+                if ringRangeInit[0,ringNum[0]] < 3:  # keep adding to average range calc window
+                    print('here.')
+                    print('Before: ringNum, ringRangeAvg = ', ringNum[0], ringRangeAvg[0,ringNum[0]])
+                    ringRangeAvg[0, ringNum[0]] = ringRangeAvg[0,ringNum[0]]+newRange
+                    ringRangeInit[0,ringNum[0]] = ringRangeInit[0,ringNum[0]]+1
+                    print('After: ringNum, ringRangeAvg = ', ringNum[0], ringRangeAvg[0,ringNum[0]])
+                elif ringRangeInit[0,ringNum[0]]==3:  # compute average (of range^2)
+                    ringRangeAvg[0,ringNum[0]] = ringRangeAvg[0,ringNum[0]]/3.0
+                    ringRangeInit[0,ringNum[0]] = ringRangeInit[0,ringNum[0]]+1
+                    print('Avg: ringNum, ringRangeAvg = ', ringNum[0], ringRangeAvg[0,ringNum[0]])
+                else:
+                    if newRange < rangeThresh*ringRangeAvg[0,ringNum[0]]:
+                        imageGrid[xIdx,yIdx] = 1.0
+                        detx = detx + x[0]
+                        dety = dety + y[0]
+                        pointCount = pointCount+1
 
 #
 # Publish message
@@ -116,29 +137,38 @@ def callback(data):
         print('regular processing mode:')
         ###x = 0.69  + np.random.normal()  # RTKFix values approximately equal to obs1 in dataset 1-10 in release 2
         ###y = -76.9 + np.random.normal()
-        ###z = 2.18 
-        x = 20.0 # data.pose.pose.position.x  # testing only relative to capture_vehicle RTK coords
-        y = -5.0 # data.pose.pose.position.y  # 
-        z = 1.0  # data.pose.pose.position.z  # 
+        ###z = 2.18
+  ###      x = 20.0 # data.pose.pose.position.x  # testing only relative to capture_vehicle RTK coords
+  ###      y = -5.0 # data.pose.pose.position.y  # 
+  ###      z = 1.0  # data.pose.pose.position.z  # 
+        if pointCount > 0:
+           x = detx / (1.0*pointCount)
+           y = dety / (1.0*pointCount) 
+           z = 1.0 # nominal
+           publishEstm =True
+        else:  # don't publish
+           publishEstm = False
     else:
         print('diagnostic processing mode:')
         x = data.pose.pose.position.x  # diagnostic testing only
         y = data.pose.pose.position.y # + 0.7239  # diagnostic testing only
         z = data.pose.pose.position.z  # diagnostic testing only
+        publishEstm = True
 
-    msg = Odometry()
-    msg.header.stamp=data.header.stamp
-    msg.pose.pose.position = Point(x, y, z) 
-    pub.publish(msg)        
+    if publishEstm:
+        msg = Odometry()
+        msg.header.stamp=data.header.stamp
+        msg.pose.pose.position = Point(x, y, z) 
+        pub.publish(msg)        
 
 #
 # Display bird-eye image
 #                
-    print('Timestamp (sec) = ', data.header.stamp.secs)
-    print('ringNum = ', ringNum)
-    cv2.imshow('image',imageGrid)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+        print('Timestamp (sec) = ', data.header.stamp.secs)
+        print('Published x, y, z = ', x, y, z)
+        cv2.imshow('image',imageGrid)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 #
 # End of callback
